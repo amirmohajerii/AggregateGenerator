@@ -1,0 +1,28 @@
+using Application.Features.{{pluralName}}.Common.Dtos;
+using Avan.Application.Bus;
+using Avan.Application.Queries;
+using Avan.Application.Queries.BasicQueries;
+using Domain.Aggregates.{{name}}Aggregate;
+
+namespace Application.Features.{{pluralName}}.Queries.GetAll;
+
+/// <summary>
+///     Query to retrieve all {{pluralName}}.
+/// </summary>
+public class GetAll{{name}}Query : BaseQuery<List<{{name}}Dto>>
+{
+}
+
+internal class GetAll{{name}}QueryHandler(IInMemoryBus bus)
+    : IBaseQueryHandler<GetAll{{name}}Query, List<{{name}}Dto>>
+{
+    public async Task<List<{{name}}Dto>> Handle(
+        GetAll{{name}}Query request,
+        CancellationToken cancellationToken)
+    {
+        List<{{name}}Dto> result = await bus.SendQuery(new AllQuery<{{name}}, {{idType}}, {{name}}Dto>())
+            .ConfigureAwait(false);
+
+        return result.Count == 0 ? [] : result;
+    }
+}

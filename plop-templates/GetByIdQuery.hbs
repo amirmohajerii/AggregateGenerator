@@ -1,0 +1,33 @@
+using Application.Features.{{pluralName}}.Common.Dtos;
+using Avan.Application.Bus;
+using Avan.Application.Queries;
+using Avan.Application.Queries.BasicQueries;
+using Domain.Aggregates.{{name}}Aggregate;
+
+namespace Application.Features.{{pluralName}}.Queries.GetById;
+
+/// <summary>
+///     Query to retrieve a single {{name}} by its unique identifier.
+/// </summary>
+public class GetById{{name}}Query({{idType}} id) : BaseQuery<{{name}}Dto?>
+{
+    
+    /// <summary>
+    ///     Gets or sets The Id of a single {{name}}.
+    /// </summary>
+    public {{idType}} Id { get; set; } = id;
+}
+
+internal sealed class GetById{{name}}QueryHandler(IInMemoryBus bus)
+    : IBaseQueryHandler<GetById{{name}}Query, {{name}}Dto?>
+{
+    public async Task<{{name}}Dto?> Handle(
+        GetById{{name}}Query request,
+        CancellationToken cancellationToken)
+    {
+        return await bus.SendQuery(new FirstOrDefaultQuery<{{name}}, {{idType}}, {{name}}Dto>
+        {
+            Predicate = p => p.Id == request.Id
+        }).ConfigureAwait(false);
+    }
+}

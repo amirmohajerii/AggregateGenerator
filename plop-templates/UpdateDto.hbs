@@ -1,0 +1,16 @@
+{{#if hasEnums}}
+using Domain.Aggregates.{{name}}Aggregate.Enums;
+{{/if}}
+
+namespace Application.Features.{{pluralName}}.Commands.Update;
+
+/// <summary>
+///     Request DTO for updating a {{name}}.
+/// </summary>
+public class Update{{name}}Dto
+{
+    public {{idType}} Id { get; set; }
+    {{#each properties}}{{#unless this.isForeignKey}}
+    public {{this.type}} {{this.name}} { get; set; }{{#if this.defaultValue}} {{{this.defaultValue}}}{{/if}}
+    {{/unless}}{{/each}}
+}

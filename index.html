@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aggregate Generator - With Handlebars Templates</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Aggregate Generator</h1>
+        
+        <div class="card">
+            <div class="form-group">
+                <label>1. Select Template Directory (plop-templates) *</label>
+                <button type="button" class="btn btn-templates" id="selectTemplatesBtn">
+                    📁 Select Templates Folder
+                </button>
+                <div id="templatesPath" style="display: none;" class="templates-loaded"></div>
+                <div id="templatesStatus"></div>
+            </div>
+
+            <div class="form-group">
+                <label>2. Select Project Directory (where to generate files) *</label>
+                <button type="button" class="btn btn-select" id="selectDirBtn">
+                    📁 Select Project Directory
+                </button>
+                <div id="selectedPath" style="display: none;" class="selected-path"></div>
+                <div id="notSupported" style="display: none;" class="not-supported">
+                    ⚠️ Your browser doesn't support direct file system access. 
+                    <br>Please use Chrome, Edge, or Opera.
+                    <br><br>
+                    <strong>Fallback:</strong> Files will be downloaded as ZIP instead.
+                </div>
+            </div>
+
+            <form id="generatorForm">
+                <div class="form-group">
+                    <label for="name">Aggregate Name *</label>
+                    <input type="text" id="name" name="name" placeholder="e.g., Agnes" required>
+                    <div class="help-text">Singular PascalCase (e.g., User, Product, Order)</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="idType">ID Type</label>
+                    <select id="idType" name="idType">
+                        <option value="int">int</option>
+                        <option value="long">long</option>
+                        <option value="Guid">Guid</option>
+                        <option value="string">string</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="hasStatus" name="hasStatus" checked>
+                        <label for="hasStatus">Has Status Field?</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Generate Layers</label>
+                    <div class="layer-checkboxes">
+                        <div class="layer-checkbox-item">
+                            <input type="checkbox" id="layerDomain" name="layerDomain" checked>
+                            <label for="layerDomain">Domain</label>
+                        </div>
+                        <div class="layer-checkbox-item">
+                            <input type="checkbox" id="layerInfrastructure" name="layerInfrastructure" checked>
+                            <label for="layerInfrastructure">Infrastructure</label>
+                        </div>
+                        <div class="layer-checkbox-item">
+                            <input type="checkbox" id="layerApplication" name="layerApplication" checked>
+                            <label for="layerApplication">Application</label>
+                        </div>
+                        <div class="layer-checkbox-item">
+                            <input type="checkbox" id="layerWebApi" name="layerWebApi" checked>
+                            <label for="layerWebApi">WebApi</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Generate Tests</label>
+                    <div class="test-checkboxes">
+                        <div class="test-checkbox-item">
+                            <input type="checkbox" id="testDomain" name="testDomain">
+                            <label for="testDomain">Domain Tests</label>
+                        </div>
+                        <div class="test-checkbox-item">
+                            <input type="checkbox" id="testApplication" name="testApplication">
+                            <label for="testApplication">Application Tests</label>
+                        </div>
+                        <div class="test-checkbox-item">
+                            <input type="checkbox" id="testIntegration" name="testIntegration">
+                            <label for="testIntegration">Integration Tests</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Properties</label>
+                    <div class="property-counter" id="propertyCounter">0 properties added</div>
+                    <div class="properties-container" id="propertiesContainer">
+                        <div class="empty-properties" id="emptyProperties">
+                            <p>No properties added yet</p>
+                            <p style="font-size: 0.85rem;">Click "Add Property" below to start adding properties</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-add" id="addPropertyBtn">
+                        + Add Property
+                    </button>
+                </div>
+
+                <button type="submit" class="btn" id="generateBtn" disabled>
+                    Load Templates & Select Directory First
+                </button>
+            </form>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem; color: white;">Generating files...</p>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.8/handlebars.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+using Domain.Aggregates.Common;
+
+namespace Application.Features.{{pluralName}}.Commands.SetStatus;
+
+/// <summary>
+///     Request DTO for changing the status of a {{name}}.
+/// </summary>
+public class SetStatus{{name}}Dto
+{
+    public {{idType}} Id { get; set; }
+    public Status Status { get; set; }
+}

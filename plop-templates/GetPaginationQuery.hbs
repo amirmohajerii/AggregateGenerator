@@ -1,0 +1,34 @@
+using Application.Features.{{pluralName}}.Common.Dtos;
+using Avan.Application.Bus;
+using Avan.Application.Queries;
+using Avan.Application.Queries.BasicQueries;
+using Domain.Aggregates.{{name}}Aggregate;
+using Garnet.Standard.Pagination;
+
+namespace Application.Features.{{pluralName}}.Queries.GetPagination;
+
+/// <summary>
+///     Query to retrieve a paginated list of {{pluralName}}.
+/// </summary>
+public class GetPagination{{name}}Query : BaseQuery<IPagedElements<{{name}}Dto>>
+{
+
+    /// <summary>
+    ///     Gets or sets query to retrieve a paginated list of {{pluralName}}.
+    /// </summary>
+    public IPagination Pagination { get; set; } = null!;
+}
+
+internal sealed class GetPagination{{name}}QueryHandler(IInMemoryBus bus)
+    : IBaseQueryHandler<GetPagination{{name}}Query, IPagedElements<{{name}}Dto>>
+{
+    public async Task<IPagedElements<{{name}}Dto>> Handle(
+        GetPagination{{name}}Query request,
+        CancellationToken cancellationToken)
+    {
+        return await bus.SendQuery(new PageableQuery<{{name}}, {{idType}}, {{name}}Dto>
+        {
+            Pagination = request.Pagination
+        }).ConfigureAwait(false);
+    }
+}

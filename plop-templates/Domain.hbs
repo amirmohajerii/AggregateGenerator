@@ -1,0 +1,131 @@
+using Avan.Domain.Models;
+{{#if hasEnums}}
+using Domain.Aggregates.{{name}}Aggregate.Enums;
+{{/if}}
+using Domain.Aggregates.Common;
+{{#each foreignKeyAggregates}}
+using Domain.Aggregates.{{this}}Aggregate;
+{{/each}}
+
+namespace Domain.Aggregates.{{name}}Aggregate;
+
+/// <summary>
+///     Represents a {{name}} aggregate root that manages {{nameLower}} entities within the domain.
+/// </summary>
+/// <remarks>
+///     The {{name}} aggregate encapsulates the core business logic and data for {{nameLower}},
+///     including property management, state transitions, and lifecycle operations.
+/// </remarks>
+public sealed class {{name}} : AggregateRoot<{{idType}}>
+{
+    #region Properties
+
+    {{#each properties}}
+    {{#if this.isForeignKey}}
+    {{#if this.aggregateName}}
+    /// <summary>
+    ///     Gets the {{this.name}}.
+    /// </summary>
+    {{else}}
+    /// <summary>
+    ///     Gets the foreign key to the parent {{this.name}}.
+    /// </summary>
+    {{/if}}
+    {{else}}
+    /// <summary>
+    ///     Gets the {{this.name}} of the {{../name}}.
+    /// </summary>
+    {{#if this.isNullable}}
+    /// <value>The {{this.name}} value, or null if not set.</value>
+    {{/if}}
+    {{/if}}
+    public {{this.type}} {{this.name}} { get; private set; }{{#if this.defaultValue}} {{{this.defaultValue}}}{{/if}}
+
+    {{/each}}
+    {{#if hasStatus}}
+    /// <summary>
+    ///     Gets the current workflow status of the {{name}}.
+    /// </summary>
+    /// <value>The <see cref="Status"/> value representing the current state of the entity.</value>
+    public Status Status { get; private set; }
+    {{/if}}
+
+    #endregion
+
+    #region Constructors
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="{{name}}"/> class with the specified properties.
+    /// </summary>
+    {{#each nonForeignKeyProperties}}
+    /// <param name="{{this.camelName}}">The {{this.name}} value.</param>
+    {{/each}}
+    {{#if hasStatus}}
+    /// <remarks>
+    ///     Creates a new {{nameLower}} with the status automatically set to DRAFT.
+    /// </remarks>
+    {{/if}}
+    public {{name}}(
+        {{#each nonForeignKeyProperties}}{{this.type}} {{this.camelName}}{{#unless @last}},
+        {{/unless}}{{/each}})
+    {
+        {{#each nonForeignKeyProperties}}
+        {{this.name}} = {{this.camelName}};
+        {{/each}}
+        {{#if hasStatus}}Status = Status.DRAFT;
+        {{/if}}
+    }
+    
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="{{name}}"/> class.
+    /// </summary>
+    /// <remarks>
+    ///     Private constructor required for Entity Framework Core materialization.
+    ///     For creating new {{nameLower}} instances, use the parameterized constructor.
+    /// </remarks>
+    private {{name}}()
+    {
+    }
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    ///     Updates the {{name}} with new values.
+    /// </summary>
+    {{#each nonForeignKeyProperties}}
+    /// <param name="{{this.camelName}}">The new {{this.name}} value.</param>
+    {{/each}}
+    /// <remarks>
+    ///     This method updates all mutable properties of the {{name}} aggregate.
+    ///     {{#if hasStatus}}
+    ///     Note that the Status is not updated by this method; use <see cref="SetStatus"/> for status changes.
+    ///     {{/if}}
+    /// </remarks>
+    public void Update(
+        {{#each nonForeignKeyProperties}}{{this.type}} {{this.camelName}}{{#unless @last}},
+        {{/unless}}{{/each}})
+    {
+        {{#each nonForeignKeyProperties}}
+        {{this.name}} = {{this.camelName}};
+        {{/each}}
+    }
+
+    {{#if hasStatus}}
+    /// <summary>
+    ///     Sets the workflow status of the {{name}}.
+    /// </summary>
+    /// <param name="status">The new status value to assign.</param>
+    /// <remarks>
+    ///     Allows transitioning the {{nameLower}} between states such as DRAFT, PUBLISHED, and RETIRED.
+    ///     No validation is performed on state transitions at this level.
+    /// </remarks>
+    public void SetStatus(Status status)
+    {
+        Status = status;
+    }
+    {{/if}}
+
+    #endregion
+}

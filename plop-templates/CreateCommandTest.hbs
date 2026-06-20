@@ -1,0 +1,93 @@
+using Application.Features.{{pluralName}}.Commands.Create;
+using Avan.Application.Bus;
+using Avan.Application.Queries.BasicQueries;
+using Bogus;
+using Domain.Aggregates.{{name}}Aggregate;
+using Domain.Aggregates.Common;
+using FluentAssertions;
+using FluentValidation.TestHelper;
+using NSubstitute;
+using Xunit;
+
+namespace Application.Test.Functionals.{{pluralName}}.Commands;
+
+/// <summary>
+/// Unit tests for Create{{name}}CommandHandler and Create{{name}}CommandValidator
+/// </summary>
+public class Create{{name}}CommandTests
+{
+    #region Handler Tests
+
+    [Fact]
+    public async Task Handle_WithValidCommand_ShouldReturnOkResult()
+    {
+        var handler = new Create{{name}}CommandHandler();
+        var command = CreateCommand();
+
+        var result = await handler.Handle(command, TestContext.Current.CancellationToken);
+
+        result.Succeeded.Should().BeTrue();
+        result.Body.Should().NotBeNull();
+    }
+
+    #endregion
+
+    #region Validator Tests
+
+    [Fact]
+    public async Task Validate_WithValidData_ShouldPass()
+    {
+        var (sut, bus) = CreateValidator();
+        SetupValidBusResponses(bus);
+        var command = CreateCommand();
+
+        var result = await sut.TestValidateAsync(command, cancellationToken: TestContext.Current.CancellationToken);
+
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    {{#if properties.length}}
+    {{#each properties}}
+    {{#if (equals this.name "Code")}}
+    [Fact]
+    public async Task Validate_WithEmptyCode_ShouldFail()
+    {
+        var (sut, bus) = CreateValidator();
+        SetupValidBusResponses(bus);
+        var command = CreateCommand(code: "");
+
+        var result = await sut.TestValidateAsync(command);
+
+        result.ShouldHaveValidationErrorFor(p => p.Code);
+    }
+    {{/if}}
+    {{/each}}
+    {{/if}}
+
+    #endregion
+
+    #region Factory & Helpers
+
+    private static Create{{name}}Command CreateCommand({{#each properties}}{{this.type}}? {{this.camelName}} = null{{#unless @last}}, {{/unless}}{{/each}})
+    {
+        return new Create{{name}}Command(
+            {{#each properties}}
+            {{this.camelName}} ?? {{name}}Faker.GenerateDefault{{this.name}}(){{#unless @last}},{{/unless}}
+            {{/each}});
+    }
+
+    private static (Create{{name}}CommandValidator, IInMemoryBus) CreateValidator()
+    {
+        var bus = Substitute.For<IInMemoryBus>();
+        var validator = new Create{{name}}CommandValidator(bus);
+        return (validator, bus);
+    }
+
+    private static void SetupValidBusResponses(IInMemoryBus bus)
+    {
+        bus.SendQuery(Arg.Any<AnyQuery<{{name}}, {{idType}}>>()).Returns(false);
+        // Add more AnyQuery setups for parent entities if needed
+    }
+
+    #endregion
+}

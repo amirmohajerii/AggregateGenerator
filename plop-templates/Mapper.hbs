@@ -1,0 +1,19 @@
+using Domain.Aggregates.{{name}}Aggregate;
+using Mapster;
+
+namespace Application.Features.{{pluralName}}.Common.Mappers;
+
+/// <summary>
+///     {{name}} mappings.
+/// </summary>
+public sealed class {{name}}ToCreate{{name}}CommandMapper : IRegister
+{
+    /// <summary>
+    /// Register mappings.
+    /// </summary>
+    /// <param name="config">Type adapter configuration.</param>
+    public void Register(TypeAdapterConfig config)
+    {
+        // Add mappings here if needed in the future
+    }
+}

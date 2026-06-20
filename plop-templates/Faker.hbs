@@ -1,0 +1,72 @@
+using Bogus;
+using Domain.Aggregates.Common;
+using Domain.Aggregates.{{name}}Aggregate;
+
+namespace Test.Shared.AggregateUtils.{{name}}Fakers;
+
+public static class {{name}}Faker
+{
+    private static readonly Faker _faker = new();
+
+    public static {{name}} Generate(
+        {{#each properties}}
+        {{this.type}}? {{this.camelName}} = null{{#unless @last}},{{/unless}}
+        {{/each}})
+    {
+        return new {{name}}(
+            {{#each properties}}
+            {{this.camelName}} ?? GenerateDefault{{this.name}}(){{#unless @last}},{{/unless}}
+            {{/each}});
+    }
+
+    public static List<{{name}}> Generate(int count)
+    {
+        return Enumerable.Range(0, count).Select(_ => Generate()).ToList();
+    }
+
+    {{#if hasStatus}}
+    public static {{name}} GenerateDraft({{#each properties}}{{this.type}}? {{this.camelName}} = null{{#unless @last}},{{/unless}}{{/each}})
+    {
+        var entity = Generate({{#each properties}}{{this.camelName}}{{#unless @last}},{{/unless}}{{/each}});
+        entity.SetStatus(Status.DRAFT);
+        return entity;
+    }
+
+    public static {{name}} GeneratePublished({{#each properties}}{{this.type}}? {{this.camelName}} = null{{#unless @last}},{{/unless}}{{/each}})
+    {
+        var entity = Generate({{#each properties}}{{this.camelName}}{{#unless @last}},{{/unless}}{{/each}});
+        entity.SetStatus(Status.PUBLISHED);
+        return entity;
+    }
+    {{/if}}
+
+    #region Default Value Generators
+
+    {{#each properties}}
+    private static {{this.type}} GenerateDefault{{this.name}}()
+    {
+        {{#if (equals this.type "string")}}
+        return _faker.Random.String2(5, 20);
+        {{/if}}
+        {{#if (equals this.type "int")}}
+        return _faker.Random.Int(1, 100);
+        {{/if}}
+        {{#if (equals this.type "long")}}
+        return _faker.Random.Long(1, 1000);
+        {{/if}}
+        {{#if (equals this.type "bool")}}
+        return _faker.Random.Bool();
+        {{/if}}
+        {{#if (equals this.type "decimal")}}
+        return _faker.Random.Decimal(0, 10000);
+        {{/if}}
+        {{#if (equals this.type "DateTime")}}
+        return _faker.Date.Recent();
+        {{/if}}
+        return default;
+    }
+
+    {{/each}}
+
+    #endregion
+}

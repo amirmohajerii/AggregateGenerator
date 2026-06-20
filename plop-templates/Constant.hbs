@@ -1,0 +1,15 @@
+namespace Application.Common.Utils.Constants;
+
+public partial class Constant
+{
+    public struct {{name}}PropertyName
+    {
+        {{#each properties}}
+        public const string {{this.name}} = "";
+        {{/each}}
+    }
+
+    public struct {{name}}PropertyMaxLength
+    {
+    }
+}

@@ -1,0 +1,78 @@
+using Application.Features.{{pluralName}}.Commands.Update;
+using Avan.Application.Bus;
+using Avan.Application.Queries.BasicQueries;
+using Domain.Aggregates.{{name}}Aggregate;
+using Domain.Aggregates.Common;
+using FluentAssertions;
+using FluentValidation.TestHelper;
+using NSubstitute;
+using Xunit;
+
+namespace Application.Test.Functionals.{{pluralName}}.Commands;
+
+/// <summary>
+/// Unit tests for Update{{name}}CommandHandler and Update{{name}}CommandValidator
+/// </summary>
+public class Update{{name}}CommandTests
+{
+    #region Handler Tests
+
+    [Fact]
+    public async Task Handle_WithValidCommand_ShouldReturnOkResult()
+    {
+        var (handler, bus) = CreateHandler();
+        var command = CreateCommand();
+        var entity = {{name}}Faker.Generate();
+        {{#if hasStatus}}entity.SetStatus(Status.DRAFT);{{/if}}
+        bus.SendQuery(Arg.Any<FirstOrDefaultQuery<{{name}}, {{idType}}>>()).Returns(entity);
+
+        var result = await handler.Handle(command, TestContext.Current.CancellationToken);
+
+        result.Succeeded.Should().BeTrue();
+    }
+
+    #endregion
+
+    #region Validator Tests
+
+    [Fact]
+    public async Task Validate_WithValidData_ShouldPass()
+    {
+        var (sut, bus) = CreateValidator();
+        bus.SendQuery(Arg.Any<FirstOrDefaultQuery<{{name}}, {{idType}}>>()).Returns({{name}}Faker.Generate());
+        var command = CreateCommand();
+
+        var result = await sut.TestValidateAsync(command);
+
+        result.ShouldNotHaveAnyValidationErrors();
+    }
+
+    #endregion
+
+    #region Factory & Helpers
+
+    private static Update{{name}}Command CreateCommand({{#each properties}}{{this.type}}? {{this.camelName}} = null{{#unless @last}}, {{/unless}}{{/each}})
+    {
+        return new Update{{name}}Command(
+            1,
+            {{#each properties}}
+            {{this.camelName}} ?? {{name}}Faker.GenerateDefault{{this.name}}(){{#unless @last}},{{/unless}}
+            {{/each}});
+    }
+
+    private static (Update{{name}}CommandHandler, IInMemoryBus) CreateHandler()
+    {
+        var bus = Substitute.For<IInMemoryBus>();
+        var handler = new Update{{name}}CommandHandler();
+        return (handler, bus);
+    }
+
+    private static (Update{{name}}CommandValidator, IInMemoryBus) CreateValidator()
+    {
+        var bus = Substitute.For<IInMemoryBus>();
+        var validator = new Update{{name}}CommandValidator(bus);
+        return (validator, bus);
+    }
+
+    #endregion
+}

@@ -1,0 +1,34 @@
+using Application.Common.Extensions;
+using Application.Common.Utils.Constants;
+using Application.Common.Utils.Validators;
+using Avan.Application.Bus;
+using Avan.Application.Commands;
+using Avan.Application.Extensions;
+using Avan.Application.Queries.BasicQueries;
+using Domain.Aggregates.{{name}}Aggregate;
+using FluentValidation;
+
+namespace Application.Features.{{pluralName}}.Commands.Delete;
+
+/// <summary>
+///     Command to delete an existing {{name}}.
+/// </summary>
+public sealed record Delete{{name}}Command({{idType}} Id) : CommandRequest<bool>;
+
+internal sealed class Delete{{name}}CommandHandler(IInMemoryBus bus)
+    : CommandRequestHandler<Delete{{name}}Command, bool>
+{
+    public override async Task<Result<bool>> Handle(
+        Delete{{name}}Command request,
+        CancellationToken cancellationToken)
+    {
+        var entity = await bus.SendQuery(new FirstOrDefaultQuery<{{name}}, {{idType}}>
+        {
+            Predicate = p => p.Id == request.Id
+        });
+
+        entity!.Delete();
+
+        return Ok(true);
+    }
+}

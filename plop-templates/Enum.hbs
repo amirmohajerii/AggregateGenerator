@@ -1,0 +1,15 @@
+namespace Domain.Aggregates.{{name}}Aggregate.Enums;
+
+/// <summary>
+///     {{enumType}} Enum for {{name}} Aggregate.
+/// </summary>
+public enum {{enumType}} : byte
+{
+    {{#each enumValues}}
+    
+    /// <summary>
+    ///     {{this}} value.
+    /// </summary>
+    {{this}} = {{add @index 1}},
+    {{/each}}
+}

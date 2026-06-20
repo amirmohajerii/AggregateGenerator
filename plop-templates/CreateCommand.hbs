@@ -1,0 +1,31 @@
+using Avan.Application.Bus;
+using Avan.Application.Commands;
+using Avan.Application.Extensions;
+{{#if hasEnums}}
+using Domain.Aggregates.{{name}}Aggregate.Enums;
+{{/if}}
+using Domain.Aggregates.{{name}}Aggregate;
+
+namespace Application.Features.{{pluralName}}.Commands.Create;
+
+/// <summary>
+///     Command to create a new {{name}}.
+/// </summary>
+public sealed record Create{{name}}Command(
+    {{#each nonForeignKeyProperties}}{{this.type}} {{this.name}}{{#unless @last}},
+    {{/unless}}{{/each}}) : CommandRequest<bool>;
+
+internal sealed class Create{{name}}CommandHandler()
+    : CommandRequestHandler<Create{{name}}Command, bool>
+{
+    public override async Task<Result<bool>> Handle(
+        Create{{name}}Command request,
+        CancellationToken cancellationToken)
+    {
+        var entity = new {{name}}(
+            {{#each nonForeignKeyProperties}}request.{{this.name}}{{#unless @last}},
+            {{/unless}}{{/each}});
+
+        return Ok(true);
+    }
+}

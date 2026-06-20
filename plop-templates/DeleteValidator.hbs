@@ -1,0 +1,22 @@
+using Application.Common.Utils.Constants;
+using Application.Common.Utils.Validators;
+using Avan.Application.Bus;
+using Domain.Aggregates.{{name}}Aggregate;
+using FluentValidation;
+
+namespace Application.Features.{{pluralName}}.Commands.Delete;
+
+/// <summary>
+///     Validator for <see cref="Delete{{name}}Command"/>.
+/// </summary>
+public sealed class Delete{{name}}CommandValidator
+    : BaseDeleteCommandValidator<Delete{{name}}Command, {{name}}, {{idType}}>
+{
+    public Delete{{name}}CommandValidator(IInMemoryBus bus)
+        : base(bus,
+              Constant.AggregateName.{{name}},   // You may need to update Constant.AggregateName manually
+              cmd => cmd.Id,
+              entity => entity.Status)
+    {
+    }
+}

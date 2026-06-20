@@ -1,0 +1,33 @@
+using Application.Common.Extensions;
+using Application.Common.Utils.Constants;
+using Avan.Application.Bus;
+using Avan.Application.Commands;
+using Avan.Application.Extensions;
+using Avan.Application.Queries.BasicQueries;
+using Domain.Aggregates.Common;
+using Domain.Aggregates.{{name}}Aggregate;
+
+namespace Application.Features.{{pluralName}}.Commands.SetStatus;
+
+/// <summary>
+///     Command to set the status of an existing {{name}}.
+/// </summary>
+public sealed record SetStatus{{name}}Command({{idType}} Id, Status Status) : CommandRequest<bool>;
+
+internal sealed class SetStatus{{name}}CommandHandler(IInMemoryBus bus)
+    : CommandRequestHandler<SetStatus{{name}}Command, bool>
+{
+    public override async Task<Result<bool>> Handle(
+        SetStatus{{name}}Command request,
+        CancellationToken cancellationToken)
+    {
+        var entity = await bus.SendQuery(new FirstOrDefaultQuery<{{name}}, {{idType}}>
+        {
+            Predicate = p => p.Id == request.Id
+        });
+
+        entity!.SetStatus(request.Status);
+
+        return Ok(true);
+    }
+}

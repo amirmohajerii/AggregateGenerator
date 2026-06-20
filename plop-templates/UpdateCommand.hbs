@@ -1,0 +1,38 @@
+using Avan.Application.Bus;
+using Avan.Application.Commands;
+using Avan.Application.Extensions;
+using Avan.Application.Queries.BasicQueries;
+{{#if hasEnums}}
+using Domain.Aggregates.{{name}}Aggregate.Enums;
+{{/if}}
+using Domain.Aggregates.{{name}}Aggregate;
+
+namespace Application.Features.{{pluralName}}.Commands.Update;
+
+/// <summary>
+///     Command to update an existing {{name}}.
+/// </summary>
+public sealed record Update{{name}}Command(
+    {{idType}} Id,
+    {{#each nonForeignKeyProperties}}{{this.type}} {{this.name}}{{#unless @last}},
+    {{/unless}}{{/each}}) : CommandRequest<bool>;
+
+internal sealed class Update{{name}}CommandHandler(IInMemoryBus bus)
+    : CommandRequestHandler<Update{{name}}Command, bool>
+{
+    public override async Task<Result<bool>> Handle(
+        Update{{name}}Command request,
+        CancellationToken cancellationToken)
+    {
+        var entity = await bus.SendQuery(new FirstOrDefaultQuery<{{name}}, {{idType}}>
+        {
+            Predicate = p => p.Id == request.Id
+        });
+
+        entity!.Update(
+            {{#each nonForeignKeyProperties}}request.{{this.name}}{{#unless @last}},
+            {{/unless}}{{/each}});
+
+        return Ok(true);
+    }
+}

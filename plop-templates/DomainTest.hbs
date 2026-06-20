@@ -1,0 +1,56 @@
+using Domain.Aggregates.{{name}}Aggregate;
+using FluentAssertions;
+using Xunit;
+
+namespace Application.Test.Functionals.{{pluralName}};
+
+public class {{name}}DomainTests
+{
+    [Fact]
+    public void Create_WithValidData_ShouldSetPropertiesCorrectly()
+    {
+        // Arrange & Act
+        var entity = new {{name}}(
+            {{#each properties}}
+            GenerateDefault{{this.name}}(){{#unless @last}},{{/unless}}
+            {{/each}});
+
+        // Assert
+        {{#each properties}}
+        entity.{{this.name}}.Should().NotBe(default({{this.type}}));
+        {{/each}}
+        {{#if hasStatus}}
+        entity.Status.Should().Be(Status.DRAFT);
+        {{/if}}
+    }
+
+    {{#if hasStatus}}
+    [Fact]
+    public void SetStatus_ShouldUpdateStatus()
+    {
+        var entity = new {{name}}({{#each properties}}GenerateDefault{{this.name}}(){{#unless @last}},{{/unless}}{{/each}});
+        
+        entity.SetStatus(Status.PUBLISHED);
+
+        entity.Status.Should().Be(Status.PUBLISHED);
+    }
+    {{/if}}
+
+    #region Helper Methods
+
+    {{#each properties}}
+    private static {{this.type}} GenerateDefault{{this.name}}()
+    {
+        {{#if (equals this.type "string")}}return "Test{{this.name}}";{{/if}}
+        {{#if (equals this.type "int")}}return 1;{{/if}}
+        {{#if (equals this.type "long")}}return 1L;{{/if}}
+        {{#if (equals this.type "bool")}}return true;{{/if}}
+        {{#if (equals this.type "decimal")}}return 100.5m;{{/if}}
+        {{#if (equals this.type "DateTime")}}return DateTime.UtcNow;{{/if}}
+        return default;
+    }
+
+    {{/each}}
+
+    #endregion
+}

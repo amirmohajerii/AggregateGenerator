@@ -1,0 +1,14 @@
+using Application.Common.Utils.Constants;
+using Avan.Application.Bus;
+using Avan.Application.Exceptions;
+using FluentValidation;
+
+namespace Application.Features.{{pluralName}}.Commands.Update;
+
+public sealed class Update{{name}}CommandValidator : AbstractValidator<Update{{name}}Command>
+{
+    public Update{{name}}CommandValidator()
+    {
+        // Add more rules based on your patterns
+    }
+}

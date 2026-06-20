@@ -1,0 +1,23 @@
+using Application.Common.Utils.Constants;
+using Application.Common.Utils.Validators;
+using Avan.Application.Bus;
+using Domain.Aggregates.{{name}}Aggregate;
+using Domain.Aggregates.Common;
+using FluentValidation;
+
+namespace Application.Features.{{pluralName}}.Commands.SetStatus;
+
+/// <summary>
+///     Validator for <see cref="SetStatus{{name}}Command"/>.
+/// </summary>
+public sealed class SetStatus{{name}}CommandValidator
+    : BaseSetStatusCommandValidator<SetStatus{{name}}Command, {{name}}, {{idType}}>
+{
+    public SetStatus{{name}}CommandValidator(IInMemoryBus bus)
+        : base(bus,
+              Constant.AggregateName.{{name}},
+              cmd => cmd.Id,
+              cmd => cmd.Status)
+    {
+    }
+}

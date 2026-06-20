@@ -1,0 +1,155 @@
+using Application.Common.Extensions;
+using Application.Features.{{pluralName}}.Commands.Create;
+using Application.Features.{{pluralName}}.Commands.Delete;
+{{#if hasStatus}}
+using Application.Features.{{pluralName}}.Commands.SetStatus;
+{{/if}}
+using Application.Features.{{pluralName}}.Commands.Update;
+using Application.Features.{{pluralName}}.Common.Dtos;
+using Application.Features.{{pluralName}}.Queries.GetAll;
+using Application.Features.{{pluralName}}.Queries.GetById;
+using Application.Features.{{pluralName}}.Queries.GetPagination;
+using Avan.Application.Bus;
+using Avan.Application.Queries.BasicQueries;
+using Avan.WebApi.Controllers;
+using Domain.Aggregates.{{name}}Aggregate;
+using Garnet.Detail.Pagination.Asp.Extensions;
+using Garnet.Standard.Pagination;
+using Mapster;
+using Microsoft.AspNetCore.Mvc;
+
+namespace WebApi.Controllers;
+
+/// <summary>
+///     Provides REST API endpoints for managing {{pluralName}},
+///     including retrieval (paginated, all, by id) and creation, update, status change, and deletion operations.
+/// </summary>
+public sealed class {{name}}Controller(IInMemoryBus bus) : BaseApiController(bus)
+{
+    /// <summary>
+    ///     Retrieves a paginated list of {{pluralName}}.
+    /// </summary>
+    /// <param name="pagination">Pagination parameters (page number, page size).</param>
+    /// <returns>
+    ///     A paginated collection of <see cref="{{name}}Dto"/> with pagination headers.
+    /// </returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(List<{{name}}Dto>), StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Get([FromQuery] IPagination pagination)
+    {
+        var result = await _bus.SendQuery(new GetPagination{{name}}Query
+        {
+            Pagination = pagination
+        }).ConfigureAwait(false);
+
+        return result.ToPaginationWithHeaderObjectResult();
+    }
+
+    /// <summary>
+    ///     Retrieves all {{pluralName}}.
+    /// </summary>
+    /// <returns>
+    ///     A list of <see cref="{{name}}Dto"/> objects.
+    /// </returns>
+    [HttpGet(nameof(All))]
+    [ProducesResponseType(typeof(List<{{name}}Dto>), StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> All()
+    {
+        var result = await _bus.SendQuery(new GetAll{{name}}Query
+        {
+        }).ConfigureAwait(false);
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    ///     Retrieves a single {{name}} by its unique identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the {{name}}.</param>
+    /// <returns>
+    ///     The <see cref="{{name}}Dto"/> if found; otherwise, an HTTP 404 Not Found result.
+    /// </returns>
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof({{name}}Dto), StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetById({{idType}} id)
+    {
+        var result = await _bus.SendQuery(new GetById{{name}}Query(id))
+                                       .ConfigureAwait(false);
+
+        if (result is null)
+        {
+            return NoContent();
+        }
+
+        return Ok(result);
+    }
+
+    /// <summary>
+    ///     Creates a new {{name}}.
+    /// </summary>
+    /// <param name="request">The command containing the data to create the {{name}}.</param>
+    /// <returns>
+    ///     HTTP 204 No Content on success, or a problem details error on failure.
+    /// </returns>
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Post([FromBody] Create{{name}}Dto request)
+    {
+        return await SendCommandAsync<bool, NoContentResult>(request.Adapt<Create{{name}}Command>())
+                     .ConfigureAwait(false);
+    }
+
+    /// <summary>
+    ///     Updates an existing {{name}}.
+    /// </summary>
+    /// <param name="request">The DTO containing the {{name}}'s updated data.</param>
+    /// <returns>
+    ///     HTTP 204 No Content on success, or a problem details error on failure.
+    /// </returns>
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Put([FromBody] Update{{name}}Dto request)
+    {
+        return await SendCommandAsync<bool, NoContentResult>(request.Adapt<Update{{name}}Command>())
+                     .ConfigureAwait(false);
+    }
+
+    {{#if hasStatus}}
+    /// <summary>
+    ///     Changes the workflow status of a {{name}}.
+    /// </summary>
+    /// <param name="request">The DTO containing the {{name}} Id and the new status.</param>
+    /// <returns>
+    ///     HTTP 204 No Content on success, or a problem details error on failure.
+    /// </returns>
+    [HttpPut(nameof(ChangeStatus))]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangeStatus([FromBody] SetStatus{{name}}Dto request)
+    {
+        return await SendCommandAsync<bool, NoContentResult>(request.Adapt<SetStatus{{name}}Command>())
+                     .ConfigureAwait(false);
+    }
+    {{/if}}
+
+    /// <summary>
+    ///     Deletes a {{name}} by its identifier.
+    /// </summary>
+    /// <param name="id">The unique identifier of the {{name}} to delete.</param>
+    /// <returns>
+    ///     HTTP 204 No Content on success, or a problem details error on failure.
+    /// </returns>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Delete({{idType}} id)
+    {
+        return await SendCommandAsync(new Delete{{name}}Command(id)).ConfigureAwait(false);
+    }
+}

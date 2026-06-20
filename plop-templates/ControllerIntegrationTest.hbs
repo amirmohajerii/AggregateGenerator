@@ -1,0 +1,162 @@
+using System.Net;
+using System.Net.Http.Json;
+using Application.Features.{{pluralName}}.Commands.Create;
+using Application.Features.{{pluralName}}.Commands.Update;
+using Application.Features.{{pluralName}}.Common.Dtos;
+using Bogus;
+using Domain.Aggregates.Common;
+using FluentAssertions;
+using Integration.Test.CollectionConfiguration;
+using Integration.Test.Utils;
+using WebApi.Controllers;
+
+namespace Integration.Test.Tests;
+
+/// <summary>
+/// Integration tests for {{name}}Controller
+/// </summary>
+[Collection(CollectionConstants.WebApiCollectionName)]
+public class {{name}}ControllerIntegrationTests
+{
+    private readonly WebApiFactory _factory;
+    private readonly HttpClient _client;
+
+    public {{name}}ControllerIntegrationTests(WebApiFactory factory)
+    {
+        _factory = factory;
+        _client = factory.HttpClient;
+    }
+
+    #region POST (Create)
+
+    [Fact]
+    public async Task Post_WithValidData_ShouldReturnCreated()
+    {
+        await _factory.ResetDatabaseAsync();
+        var dto = CreateValidCreateDto();
+
+        var response = await _client.PostAsJsonAsync("/api/{{name}}", dto, TestContext.Current.CancellationToken);
+
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        var result = await response.Content.ReadFromJsonAsync<{{name}}Dto>();
+        result.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Post_WithInvalidData_ShouldReturnBadRequest()
+    {
+        await _factory.ResetDatabaseAsync();
+        var dto = CreateValidCreateDto();
+        dto.Code = ""; // Trigger validation error
+
+        var response = await _client.PostAsJsonAsync("/api/{{name}}", dto);
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    #endregion
+
+    #region PUT (Update)
+
+    [Fact]
+    public async Task Put_WithValidData_ShouldReturnOk()
+    {
+        await _factory.ResetDatabaseAsync();
+        var createDto = CreateValidCreateDto();
+        var createResponse = await _client.PostAsJsonAsync("/api/{{name}}", createDto);
+        var created = await createResponse.Content.ReadFromJsonAsync<{{name}}Dto>();
+
+        var updateDto = new Update{{name}}Dto
+        {
+            {{#each properties}}
+            {{this.name}} = {{name}}Faker.GenerateDefault{{this.name}}(){{#unless @last}},{{/unless}}
+            {{/each}}
+        };
+
+        var response = await _client.PutAsJsonAsync($"/api/{{name}}/{created.Id}", updateDto);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    #endregion
+
+    #region GET
+
+    [Fact]
+    public async Task GetById_WithExistingId_ShouldReturnOk()
+    {
+        await _factory.ResetDatabaseAsync();
+        var createDto = CreateValidCreateDto();
+        var createResponse = await _client.PostAsJsonAsync("/api/{{name}}", createDto);
+        var created = await createResponse.Content.ReadFromJsonAsync<{{name}}Dto>();
+
+        var response = await _client.GetAsync($"/api/{{name}}/{created.Id}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    public async Task GetAll_ShouldReturnOk()
+    {
+        await _factory.ResetDatabaseAsync();
+        await _client.PostAsJsonAsync("/api/{{name}}", CreateValidCreateDto());
+
+        var response = await _client.GetAsync("/api/{{name}}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    #endregion
+
+    {{#if hasStatus}}
+    #region Change Status
+
+    [Fact]
+    public async Task ChangeStatus_ToPublished_ShouldReturnOk()
+    {
+        await _factory.ResetDatabaseAsync();
+        var createDto = CreateValidCreateDto();
+        var createResponse = await _client.PostAsJsonAsync("/api/{{name}}", createDto);
+        var created = await createResponse.Content.ReadFromJsonAsync<{{name}}Dto>();
+
+        var statusDto = new SetStatus{{name}}Dto { Status = Status.PUBLISHED };
+
+        var response = await _client.PutAsJsonAsync($"/api/{{name}}/{created.Id}/status", statusDto);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+    }
+
+    #endregion
+    {{/if}}
+
+    #region DELETE
+
+    [Fact]
+    public async Task Delete_WithExistingId_ShouldReturnNoContent()
+    {
+        await _factory.ResetDatabaseAsync();
+        var createDto = CreateValidCreateDto();
+        var createResponse = await _client.PostAsJsonAsync("/api/{{name}}", createDto);
+        var created = await createResponse.Content.ReadFromJsonAsync<{{name}}Dto>();
+
+        var response = await _client.DeleteAsync($"/api/{{name}}/{created.Id}");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
+    }
+
+    #endregion
+
+    #region Factory Helpers
+
+    private static Create{{name}}Dto CreateValidCreateDto()
+    {
+        return new Create{{name}}Dto
+        {
+            {{#each properties}}
+            {{this.name}} = {{name}}Faker.GenerateDefault{{this.name}}(){{#unless @last}},{{/unless}}
+            {{/each}}
+        };
+    }
+
+    #endregion
+}

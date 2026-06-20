@@ -1,0 +1,55 @@
+{{#if hasEnums}}
+using Domain.Aggregates.{{name}}Aggregate.Enums;
+{{/if}}
+{{#each properties}}
+{{#if this.isForeignKey}}
+{{#if this.aggregateName}}
+using Application.Features.{{this.aggregateName}}s.Common.Dtos;
+{{/if}}
+{{/if}}
+{{/each}}
+using Domain.Aggregates.Common;
+
+namespace Application.Features.{{pluralName}}.Common.Dtos;
+
+/// <summary>
+///     Data transfer object for {{name}}.
+/// </summary>
+public sealed class {{name}}Dto
+{
+    /// <summary>
+    ///     Gets or sets the unique identifier of the {{name}}.
+    /// </summary>
+    public {{idType}} Id { get; set; }
+
+{{#each properties}}
+{{#if this.isForeignKey}}
+{{#if this.aggregateName}}
+
+    /// <summary>
+    ///     Gets or sets the {{this.name}}.
+    /// </summary>
+    public {{this.aggregateName}}Dto {{this.name}} { get; set; }{{#if this.defaultValue}} {{{this.defaultValue}}}{{/if}}
+{{else}}
+
+    /// <summary>
+    ///     Gets or sets the foreign key to the parent {{this.name}}.
+    /// </summary>
+    public {{this.type}} {{this.name}} { get; set; }{{#if this.defaultValue}} {{{this.defaultValue}}}{{/if}}
+{{/if}}
+{{else}}
+
+    /// <summary>
+    ///     Gets or sets the {{this.name}} of the {{../name}}.
+    /// </summary>
+    public {{this.type}} {{this.name}} { get; set; }{{#if this.defaultValue}} {{{this.defaultValue}}}{{/if}}
+{{/if}}
+{{/each}}
+{{#if hasStatus}}
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether the {{name}} is active.
+    /// </summary>
+    public Status Status { get; set; }
+{{/if}}
+}
