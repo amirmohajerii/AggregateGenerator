@@ -386,7 +386,6 @@ async function loadTemplates(dirHandle) {
         'UpdateValidator.hbs',   
         'UpdateDto.hbs',
         'DeleteCommand.hbs',
-        'DeleteValidator.hbs',
         'GetAllQuery.hbs',
         'GetByIdQuery.hbs',
         'GetPaginationQuery.hbs',
@@ -581,7 +580,6 @@ function generateFiles(formData) {
         addFile(`Application/Features/${data.pluralName}/Commands/Update/Update${data.name}Dto.cs`, 'UpdateDto.hbs');
         addFile(`Application/Features/${data.pluralName}/Commands/Update/Update${data.name}CommandValidator.cs`, 'UpdateValidator.hbs');
         addFile(`Application/Features/${data.pluralName}/Commands/Delete/Delete${data.name}Command.cs`, 'DeleteCommand.hbs');
-        addFile(`Application/Features/${data.pluralName}/Commands/Delete/Delete${data.name}CommandValidator.cs`, 'DeleteValidator.hbs');
         addFile(`Application/Features/${data.pluralName}/Queries/GetAll/GetAll${data.name}Query.cs`, 'GetAllQuery.hbs');
         addFile(`Application/Features/${data.pluralName}/Queries/GetById/GetById${data.name}Query.cs`, 'GetByIdQuery.hbs');
         addFile(`Application/Features/${data.pluralName}/Queries/GetPagination/GetPagination${data.name}Query.cs`, 'GetPaginationQuery.hbs');

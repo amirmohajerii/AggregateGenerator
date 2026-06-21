@@ -24,11 +24,15 @@ internal sealed class Delete{{name}}CommandHandler(IInMemoryBus bus)
     {
         var entity = await bus.SendQuery(new FirstOrDefaultQuery<{{name}}, {{idType}}>
         {
-            Predicate = p => p.Id == request.Id
+            Predicate = p => p.Id == request.Id{{#if hasStatus}} && p.Status == Status.DRAFT{{/if}}
         });
 
-        entity!.Delete();
+        if (entity != null)
+        {
+            entity.Delete();
+            return Ok(true);
+        }
 
-        return Ok(true);
+        return Error(ApplicationErrorCode.NOT_EXIST_OR_NOT_DRAFT(AggregateName.{{name}}));
     }
 }
