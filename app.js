@@ -581,7 +581,7 @@ function generateFiles(formData) {
         addFile(`Application/Features/${data.pluralName}/Commands/Update/Update${data.name}CommandValidator.cs`, 'UpdateValidator.hbs');
         addFile(`Application/Features/${data.pluralName}/Commands/Delete/Delete${data.name}Command.cs`, 'DeleteCommand.hbs');
         addFile(`Application/Features/${data.pluralName}/Queries/GetAll/GetAll${data.name}Query.cs`, 'GetAllQuery.hbs');
-        addFile(`Application/Features/${data.pluralName}/Queries/GetById/GetById${data.name}Query.cs`, 'GetByIdQuery.hbs');
+        addFile(`Application/Features/${data.pluralName}/Queries/GetById/Get${data.name}ByIdQuery.cs`, 'GetByIdQuery.hbs');
         addFile(`Application/Features/${data.pluralName}/Queries/GetPagination/GetPagination${data.name}Query.cs`, 'GetPaginationQuery.hbs');
         addFile(`Application/Features/${data.pluralName}/Common/Dtos/${data.name}Dto.cs`, 'CommonDto.hbs');
         addFile(`Application/Features/${data.pluralName}/Common/Mappers/${data.name}MappingProfile.cs`, 'Mapper.hbs');

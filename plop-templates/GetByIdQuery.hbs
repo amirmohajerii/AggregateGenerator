@@ -9,7 +9,7 @@ namespace Application.Features.{{pluralName}}.Queries.GetById;
 /// <summary>
 ///     Query to retrieve a single {{name}} by its unique identifier.
 /// </summary>
-public class GetById{{name}}Query({{idType}} id) : BaseQuery<{{name}}Dto?>
+public class Get{{name}}ByIdQuery({{idType}} id) : BaseQuery<{{name}}Dto?>
 {
     
     /// <summary>
@@ -18,11 +18,11 @@ public class GetById{{name}}Query({{idType}} id) : BaseQuery<{{name}}Dto?>
     public {{idType}} Id { get; set; } = id;
 }
 
-internal sealed class GetById{{name}}QueryHandler(IInMemoryBus bus)
-    : IBaseQueryHandler<GetById{{name}}Query, {{name}}Dto?>
+internal sealed class Get{{name}}ByIdQueryHandler(IInMemoryBus bus)
+    : IBaseQueryHandler<Get{{name}}ByIdQuery, {{name}}Dto?>
 {
     public async Task<{{name}}Dto?> Handle(
-        GetById{{name}}Query request,
+        Get{{name}}ByIdQuery request,
         CancellationToken cancellationToken)
     {
         return await bus.SendQuery(new FirstOrDefaultQuery<{{name}}, {{idType}}, {{name}}Dto>
